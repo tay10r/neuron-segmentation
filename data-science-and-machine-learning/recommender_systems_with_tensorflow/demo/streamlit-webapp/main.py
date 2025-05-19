@@ -6,7 +6,7 @@ import requests
 # --- Streamlit Page Configuration ---
 st.set_page_config(
     page_title="Movie Recommendation Agent",
-    page_icon="🎬",
+    page_icon = "🎬",
     layout="centered"
 )
 
@@ -44,36 +44,41 @@ st.markdown("""
 
 # --- Header ---
 st.markdown("<h1 style='text-align: center; color: #2C3E50;'>🎥 Movie Recommendation Agent</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: #555;'> Have a movie recommendation based on your movie review.</h3>", unsafe_allow_html=True)
+
+st.markdown("<h4 style='text-align: center; color: #555;'> Have a movie recommendation based on your movie review.</h3>", unsafe_allow_html=True)
+
 
 # ─────────────────────────────────────────────────────────────
-# 1 ▸ Main – data input
+# 1 ▸ Server Settings
 # ─────────────────────────────────────────────────────────────
-user_id= st.number_input(
+api_url = os.getenv("API_URL", "https://localhost:61743/invocations")  # Update this URL accordingly
+    
+# ─────────────────────────────────────────────────────────────
+# 2 ▸ Main – data input
+# ─────────────────────────────────────────────────────────────
+user_id = st.number_input(
     "Enter your User ID:",
-     min_value=0
+     min_value = 0
 )
 movie_id = st.number_input(
     "Enter a movie ID", 
-    min_value=0
+    min_value = 0
 )
 
 # ─────────────────────────────────────────────────────────────
-# 2 ▸ Call the model
+# 3 ▸ Call the model
 # ─────────────────────────────────────────────────────────────
 if st.button("🍿 Get Recommendations"):
     if not user_id:
         st.warning("⚠️ Please enter your User ID!")
-    if not movie_id:
+    elif not movie_id:
         st.warning("⚠️ Please enter a Movie ID!")
     else:
-        # API Configuration
-        api_url = os.getenv("API_URL", "https://localhost:61743/invocations")  # Update this URL accordingly
-        payload = {
-            "inputs": {"user_id": [user_id], "movie_id":[movie_id]},
-        }
         # --- Loading Spinner ---
         with st.spinner("Fetching recommendations..."):
+            payload = {
+                "inputs": {"user_id": [user_id], "movie_id":[movie_id]},
+            }
             try:
                 response = requests.post(api_url, json=payload, verify=False)
                 response.raise_for_status()
@@ -100,14 +105,14 @@ if st.button("🍿 Get Recommendations"):
                     st.error("❌ Unexpected response format. Please try again.")
 
             except requests.exceptions.RequestException as e:
-                st.error("❌ Error fetching recommendations. Please check your connection.")
+                st.error("❌ Error fetching recommendations.")
                 st.error(str(e))
 # ─────────────────────────────────────────────────────────────
-# 3 ▸ Footer
+# 4 ▸ Footer
 # ─────────────────────────────────────────────────────────────
 st.markdown(
 """
-*🎥🍿Recommender Movies System © 2025* local, private, recommender system + MLflow.
+*🎥🍿Recommender Movies System © 2025* local, private, recommender system + MLflow.
 
 ---
 > Built with ❤️ using [**Z by HP AI Studio**](https://zdocs.datascience.hp.com/docs/aistudio/overview).
