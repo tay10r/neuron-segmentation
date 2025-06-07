@@ -1,0 +1,2 @@
+neuroscope @ git+https://github.com/tay10r/neuroscope
+
