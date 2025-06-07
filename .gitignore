@@ -131,3 +131,4 @@ dmypy.json
 # Custom stuff
 code/build
 code/.cache
+data/imagery

@@ -24,7 +24,7 @@ contrast microscopy and more physically-based parameterization of confocal fluor
 |   | - README.md                          # This file.
 ```
 
-### Setup
+### Setup with HP AI Studio
 
 We use HP AI Studio to generate data and train models. This allows us to iterate quickly between tweaking physical
 parameters of the microscope and training the model. If you're familiar with how to setup and run Jupyter, MLFlow, and
@@ -33,3 +33,8 @@ Tensorboard, you may also set those up and run the code with your own configurat
 | Step | Instructions                         |
 |------|--------------------------------------|
 |    1 | Create a new project in HP AI Studio |
+|    2 | Set the Git Repository URL to `https://github.com/tay10r/neuron-segmentation.git` |
+|    3 | Choose the Git Local Folder so that the cloned repo has somewhere to live. |
+|    4 | Proceed to Create a Workspace and select the Deep Learning GPU template. |
+|    5 | Name the workspace (for example: *Neuron Segmentation Workspace*) |
+|    6 | Install Embree (for the simulator): `conda install conda-forge::embree`

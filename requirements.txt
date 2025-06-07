@@ -1,2 +1,2 @@
-neuroscope @ git+https://github.com/tay10r/neuroscope
-
+neuroscope @ git+https://github.com/tay10r/neuroscope@v0.1
+pillow
