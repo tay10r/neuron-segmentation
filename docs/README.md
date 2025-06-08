@@ -17,11 +17,13 @@ contrast microscopy and more physically-based parameterization of confocal fluor
 ### Project Structure
 
 ```
-| - notebooks
-|   | - synthetic_data_generation.ipynb    # Use this notebook first, to generate the training data.
-|   | - model_training.ipynb               # This trains a variant of U-net to segment the neurons.
-| - docs
-|   | - README.md                          # This file.
+| - notebooks/
+|   | - 00_Data_Generation.ipynb  # Use this notebook first, to generate the training data.
+|   | - 01_Model_Training.ipynb   # This trains a variant of U-net to segment the neurons.
+| - docs/
+|   | - README.md                 # This file.
+| - code/                         # A directory containing the source code for the demo web page.
+| - demo/                         # The pre-built demo web page
 ```
 
 ### Setup with HP AI Studio

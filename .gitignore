@@ -132,3 +132,6 @@ dmypy.json
 code/build
 code/.cache
 data/imagery
+data/mlflow
+data/tensorboard
+*.pt

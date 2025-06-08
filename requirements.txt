@@ -1,2 +1,9 @@
-neuroscope @ git+https://github.com/tay10r/neuroscope@v0.1
+neuroscope @ git+https://github.com/tay10r/neuroscope@v0.2
+numpy
 pillow
+mlflow
+tqdm
+matplotlib
+torch
+torchvision
+tensorboard
