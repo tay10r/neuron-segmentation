@@ -17,7 +17,7 @@ class request_impl final : public request
   bool failed_{ true };
 
 public:
-  request_impl(std::string url, std::string payload = {})
+  request_impl(std::string url, std::string payload = {}, std::string content_type = {})
     : url_(std::move(url))
   {
     emscripten_fetch_attr_t attr;
@@ -53,6 +53,11 @@ public:
       attr.requestDataSize = payload.size();
     }
 
+    const char* headers[] = { "Content-Type", content_type.c_str(), nullptr };
+    if (!content_type.empty()) {
+      attr.requestHeaders = headers;
+    }
+
     emscripten_fetch(&attr, url_.c_str());
   }
 
@@ -76,5 +81,5 @@ request::get(const std::string& path) -> std::unique_ptr<request>
 auto
 request::post(const std::string& path, std::string payload) -> std::unique_ptr<request>
 {
-  return std::make_unique<request_impl>(path, std::move(payload));
+  return std::make_unique<request_impl>(path, std::move(payload), "application/json");
 }
