@@ -14,8 +14,27 @@ FetchContent_Declare(uikit
 )
 FetchContent_MakeAvailable(uikit)
 
-add_executable(neuron_segmentation_demo
+set(sources
   app.cpp
+  request.h
+  deps/stb/stb.c
+  deps/stb/stb_image.h
+  deps/stb/stb_image_write.h
+  deps/base64/base64.hpp
+)
+
+if(EMSCRIPTEN)
+  list(APPEND sources request_browser.cpp)
+else()
+  list(APPEND sources request_desktop.cpp)
+endif()
+
+add_executable(neuron_segmentation_demo ${sources})
+
+target_include_directories(neuron_segmentation_demo
+  PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/stb"
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/base64"
 )
 
 target_link_libraries(neuron_segmentation_demo
@@ -24,7 +43,10 @@ target_link_libraries(neuron_segmentation_demo
     uikit::main
 )
 
-set_target_properties(neuron_segmentation_demo
-  PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../demo"
-)
+if(EMSCRIPTEN)
+  set_target_properties(neuron_segmentation_demo
+    PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../demo"
+  )
+  target_link_options(neuron_segmentation_demo PUBLIC "-sFETCH")
+endif()
