@@ -77,15 +77,15 @@ def open_user_config(path: str = 'user_config.json') -> UserConfig:
 
     # auto detect default
     if cfg.mlflow_tracking_uri == '':
-        if Path('/pheonix/mlflow').exists():
-            cfg.mlflow_tracking_uri = '/pheonix/mlflow'
+        if Path('/phoenix/mlflow').exists():
+            cfg.mlflow_tracking_uri = '/phoenix/mlflow'
         else:
             cfg.mlflow_tracking_uri = 'mlruns'
 
     # auto detect default
     if cfg.tensorboard_dir == '':
-        if Path('/pheonix/tensorboard').exists():
-            cfg.tensorboard_dir = '/pheonix/tensorboard/tensorlogs'
+        if Path('/phoenix/tensorboard').exists():
+            cfg.tensorboard_dir = '/phoenix/tensorboard/tensorlogs'
         else:
             cfg.tensorboard_dir = 'runs'
 

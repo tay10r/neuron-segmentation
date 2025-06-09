@@ -46,8 +46,19 @@ Tensorboard, you may also set those up and run the code with your own configurat
 ### Running Project
 
 The project is meant to be run using the notebooks.
-The first thing you'll want to do is run the setup instructions above.
-Then, you may run the first notebook, `00_Data_Generation.ipynb` in order to generate training and validation data.
-Next, you may run the training notebook, `01_Model_Training.ipynb` in order to train a model.
-Finally, you may run the deployment notebook, `02_Deploy.ipynb` in order to deploy the model to a local MLFlow server.
-If you are running this in HP AI Studio, you may also use the deployed model and demo web page after running the last notebook.
+Assuming you have run the setup instructions listed above, you can start running the notebooks.
+The notebooks are numbered by the order in which they should be executed.
+
+ - Run `00_Data_Generation.ipynb` in order to generate training and validation data.
+ - Next, you may run the training notebook, `01_Model_Training.ipynb` in order to train a model.
+ - Finally, you may run the deployment notebook, `02_Deploy.ipynb` in order to deploy the model to a local MLFlow server. If you are running this in HP AI Studio, you may also use the deployed model and demo web page after running the last notebook.
+
+If you've deployed the model with the last notebook, you can deploy the model in HP AI Studio.
+The web page will be hosted on `localhost` with the port being listed in the HP AI Studio UI.
+With the hostname and port number, you can navigate to the web page for testing the network using the following format:
+
+```
+http://localhost:<PORT>/demo/index.html
+```
+
+Where `<PORT>` should be replaced with the port number you see listed in the HP AI Studio **Deployments** tab.
