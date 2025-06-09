@@ -5,6 +5,7 @@
 #include <GLES2/gl2.h>
 #include <base64.hpp>
 #include <implot.h>
+#include <json.hpp>
 #include <stb_image.h>
 #include <stb_image_write.h>
 
@@ -12,6 +13,7 @@
 #include <random>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace {
@@ -29,6 +31,8 @@ class app_impl final : public uikit::app
   size_t selected_image_{ static_cast<size_t>(-1) };
 
   stbi_uc* current_image_{ nullptr };
+
+  stbi_uc* segmentation_image_{ nullptr };
 
   stbi_uc* noisy_image_{ nullptr };
 
@@ -59,6 +63,10 @@ public:
   {
     if (current_image_) {
       stbi_image_free(current_image_);
+    }
+
+    if (segmentation_image_) {
+      stbi_image_free(segmentation_image_);
     }
 
     if (noisy_image_) {
@@ -141,6 +149,8 @@ protected:
       return;
     }
 
+    ImPlot::SetupAxesLimits(0, 512, 0, 512, ImPlotCond_Once);
+
     ImPlot::PlotImage(
       "##Image", reinterpret_cast<ImTextureID>(texture_), ImPlotPoint(0, 0), ImPlotPoint(width_, height_));
 
@@ -180,6 +190,11 @@ protected:
       free(noisy_image_);
     }
 
+    if (segmentation_image_) {
+      stbi_image_free(segmentation_image_);
+      segmentation_image_ = nullptr;
+    }
+
     if (current_image_) {
       stbi_image_free(current_image_);
     }
@@ -198,8 +213,40 @@ protected:
 
   void load_inference_result(const void* data, const size_t size)
   {
-    // TODO
-    tmp_ = std::string(static_cast<const char*>(data), size);
+    if (segmentation_image_) {
+      stbi_image_free(segmentation_image_);
+      segmentation_image_ = nullptr;
+    }
+
+    const auto root = nlohmann::json::parse(static_cast<const char*>(data), static_cast<const char*>(data) + size);
+
+    std::string_view prediction;
+
+    for (const auto& pred : root.at("predictions")) {
+
+      const auto png_buffer = base64::from_base64(pred.get<std::string_view>());
+
+      int w{};
+      int h{};
+
+      segmentation_image_ = stbi_load_from_memory(
+        reinterpret_cast<const stbi_uc*>(png_buffer.data()), png_buffer.size(), &w, &h, nullptr, 3);
+      if (!segmentation_image_) {
+        continue;
+      }
+
+      if ((w != width_) || (h != height_)) {
+        stbi_image_free(segmentation_image_);
+        segmentation_image_ = nullptr;
+        continue;
+      }
+
+      break;
+    }
+
+    if (segmentation_image_) {
+      process_image();
+    }
   }
 
   void process_image()
@@ -219,6 +266,13 @@ protected:
         const float b = dist(rng);
         const float c = a + (b - a) * noise_;
         out[j] = static_cast<uint8_t>(std::clamp(static_cast<int>(c * 255), 0, 255));
+      }
+
+      if (segmentation_image_) {
+        const auto* mask = &segmentation_image_[i * 3];
+        for (int j = 0; j < 3; j++) {
+          out[j] = static_cast<uint8_t>((static_cast<int>(mask[j]) + static_cast<int>(out[j])) >> 1);
+        }
       }
 
       noisy_image_[i * 4 + 0] = out[0];
@@ -257,6 +311,7 @@ protected:
         image_request_.reset();
       }
     }
+
     if (inference_request_) {
       if (inference_request_->done()) {
         if (!inference_request_->failed()) {

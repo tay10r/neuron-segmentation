@@ -17,6 +17,7 @@ FetchContent_MakeAvailable(uikit)
 set(sources
   app.cpp
   request.h
+  deps/json/json.hpp
   deps/stb/stb.c
   deps/stb/stb_image.h
   deps/stb/stb_image_write.h
@@ -31,10 +32,13 @@ endif()
 
 add_executable(neuron_segmentation_demo ${sources})
 
+target_compile_features(neuron_segmentation_demo PUBLIC cxx_std_17)
+
 target_include_directories(neuron_segmentation_demo
   PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/deps/stb"
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/base64"
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/json"
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/stb"
 )
 
 target_link_libraries(neuron_segmentation_demo
