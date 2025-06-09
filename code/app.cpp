@@ -61,12 +61,10 @@ public:
 
   void teardown(uikit::platform&) override
   {
+    clear_segmentation();
+
     if (current_image_) {
       stbi_image_free(current_image_);
-    }
-
-    if (segmentation_image_) {
-      stbi_image_free(segmentation_image_);
     }
 
     if (noisy_image_) {
@@ -80,20 +78,14 @@ public:
   {
     poll_requests();
 
-    ImGui::DockSpaceOverViewport();
+    auto& io = ImGui::GetIO();
 
-    if (ImGui::Begin("debug")) {
-      ImGui::InputText("##tmp", &tmp_[0], tmp_.size(), ImGuiInputTextFlags_ReadOnly);
-    }
-    ImGui::End();
+    ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Always);
 
-    if (ImGui::Begin("Gallery")) {
-      render_gallery();
-    }
-    ImGui::End();
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
-    if (ImGui::Begin("Viewport")) {
-      render_viewport();
+    if (ImGui::Begin("##mainwindow", nullptr, ImGuiWindowFlags_NoDecoration)) {
+      render_main_window();
     }
     ImGui::End();
   }
@@ -101,8 +93,23 @@ public:
 protected:
   void open_image(const std::string& filename) { image_request_ = request::get(std::string("images/") + filename); }
 
+  void clear_segmentation()
+  {
+    if (segmentation_image_) {
+      stbi_image_free(segmentation_image_);
+      segmentation_image_ = nullptr;
+    }
+  }
+
   void issue_segmentation_request()
   {
+    // Clear the current segmentation image if it exists,
+    // so that it does not get inserted into the network input.
+    clear_segmentation();
+
+    // Reproduce the image without the segmentation overlay.
+    process_image();
+
     std::vector<unsigned char> gray_buffer(width_ * height_);
 
     const int num_pixels{ width_ * height_ };
@@ -133,15 +140,33 @@ protected:
     inference_request_ = request::post("/invocations", std::move(payload));
   }
 
-  void render_viewport()
+  void render_main_window()
   {
+    const char* selected{ (selected_image_ < image_list_.size()) ? image_list_[selected_image_].c_str()
+                                                                 : "(pick one)" };
+
+    if (ImGui::BeginCombo("Image", selected)) {
+      for (size_t i = 0; i < image_list_.size(); i++) {
+        if (ImGui::Selectable(image_list_[i].c_str(), i == selected_image_)) {
+          selected_image_ = i;
+          open_image(image_list_[i]);
+        }
+      }
+      ImGui::EndCombo();
+    }
+
     ImGui::BeginDisabled(!!inference_request_ || !current_image_);
+
     if (ImGui::Button("Segment")) {
       issue_segmentation_request();
     }
+
+    ImGui::SameLine();
+
     if (ImGui::SliderFloat("Noise", &noise_, 0, 1)) {
       process_image();
     }
+
     ImGui::EndDisabled();
 
     if (!ImPlot::BeginPlot(
@@ -186,13 +211,10 @@ protected:
 
   void load_image(const void* data, const size_t size)
   {
+    clear_segmentation();
+
     if (noisy_image_) {
       free(noisy_image_);
-    }
-
-    if (segmentation_image_) {
-      stbi_image_free(segmentation_image_);
-      segmentation_image_ = nullptr;
     }
 
     if (current_image_) {
@@ -213,10 +235,7 @@ protected:
 
   void load_inference_result(const void* data, const size_t size)
   {
-    if (segmentation_image_) {
-      stbi_image_free(segmentation_image_);
-      segmentation_image_ = nullptr;
-    }
+    clear_segmentation();
 
     const auto root = nlohmann::json::parse(static_cast<const char*>(data), static_cast<const char*>(data) + size);
 
