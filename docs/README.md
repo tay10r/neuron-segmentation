@@ -39,4 +39,15 @@ Tensorboard, you may also set those up and run the code with your own configurat
 |    3 | Choose the Git Local Folder so that the cloned repo has somewhere to live. |
 |    4 | Proceed to Create a Workspace and select the Deep Learning GPU template. |
 |    5 | Name the workspace (for example: *Neuron Segmentation Workspace*) |
-|    6 | Install Embree (for the simulator): `conda install conda-forge::embree`
+|    6 | Open a new Terminal in Jupyter and navigate to the repo at `neuron-segmentation` |
+|    7 | Install Embree (for the simulator): `conda install conda-forge::embree`
+|    8 | Install Python Dependencies: `pip3 install -r requirements.txt` |
+
+### Running Project
+
+The project is meant to be run using the notebooks.
+The first thing you'll want to do is run the setup instructions above.
+Then, you may run the first notebook, `00_Data_Generation.ipynb` in order to generate training and validation data.
+Next, you may run the training notebook, `01_Model_Training.ipynb` in order to train a model.
+Finally, you may run the deployment notebook, `02_Deploy.ipynb` in order to deploy the model to a local MLFlow server.
+If you are running this in HP AI Studio, you may also use the deployed model and demo web page after running the last notebook.

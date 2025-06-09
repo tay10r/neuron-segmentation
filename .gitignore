@@ -132,6 +132,8 @@ dmypy.json
 code/build
 code/.cache
 data/imagery
-data/mlflow
-data/tensorboard
+notebooks/runs
+notebooks/mlruns
+notebooks/user_config.json
 *.pt
+*.onnx
